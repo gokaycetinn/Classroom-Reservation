@@ -1,68 +1,66 @@
-# Classroom Reservation System
+# 🎓 Classroom Reservation System
 
-Sınıf rezervasyon sistemi - ASP.NET Core Razor Pages ile geliştirilmiş web uygulaması.
+A classroom reservation system – a web application built with ASP.NET Core Razor Pages.
 
-## Özellikler
+## 🚀 Features
 
-- **Kullanıcı Yönetimi**: ASP.NET Core Identity ile güvenli kimlik doğrulama
-- **Rol Tabanlı Yetkilendirme**: Admin ve Instructor rolleri
-- **Sınıf Rezervasyonu**: Tarih ve saat bazlı rezervasyon sistemi
-- **Email Bildirimleri**: SMTP tabanlı email servisi
-- **Geri Bildirim Sistemi**: Kullanıcı geri bildirimlerinin yönetimi
-- **Raporlama**: Admin panelinde detaylı raporlama
-- **Loglama**: Serilog ile kapsamlı loglama sistemi
+- 🔐 **User Management** – Login and registration with ASP.NET Core Identity  
+- 🛡 **Role-Based Authorization** – Admin and Instructor permissions  
+- 🕒 **Classroom Reservation** – Date & time-based scheduling with conflict prevention  
+- ✉️ **Email Notifications** – Automatic email sending via SMTP  
+- 💬 **Feedback System** – User feedback delivered to admin  
+- 📊 **Reporting** – Detailed usage and reservation reports in admin panel  
 
-## Teknolojiler
 
-- ASP.NET Core 9.0
-- Entity Framework Core
-- SQL Server
-- ASP.NET Core Identity
-- Razor Pages
-- Bootstrap 5
-- jQuery
-- Serilog
+## Technologies
 
-## Kurulum
+| Layer     | Technology                              |
+|-----------|------------------------------------------|
+| Backend   | ASP.NET Core 9.0, Entity Framework Core |
+| Frontend  | Razor Pages, Bootstrap 5, jQuery        |
+| Database  | SQL Server                              |
+| Identity  | ASP.NET Core Identity                   |
 
-### Gereksinimler
+## ⚙️ Installation
 
-- .NET 9.0 SDK
-- SQL Server (LocalDB veya Full Edition)
-- Visual Studio 2022 (önerilen)
+### 💡 Requirements
 
-### Adımlar
+- .NET 9.0 SDK  
+- SQL Server (LocalDB or Full Edition)  
+- Visual Studio 2022 (recommended)
 
-1. Projeyi klonlayın:
+### 🔧 Steps
+
+1. Clone the project:
 ```bash
 git clone https://github.com/gokaycetin/ClassroomReservation.git
 cd ClassroomReservation
 ```
 
-2. `appsettings.json` dosyasını yapılandırın:
+2. Configure the `appsettings.json` file:
 ```bash
 cp appsettings.example.json appsettings.json
 ```
 
-3. `appsettings.json` dosyasında aşağıdaki ayarları yapın:
-   - **ConnectionStrings**: SQL Server bağlantı stringinizi güncelleyin
-   - **SmtpSettings**: Email servisi için SMTP ayarlarını yapın
+3. Update the following settings in `appsettings.json`:
+   - **ConnectionStrings**: Set your SQL Server connection string
+   - **SmtpSettings**: Set your SMTP email server settings
 
-4. Veritabanını oluşturun:
+4. Apply the database migrations:
 ```bash
 dotnet ef database update
 ```
 
-5. Uygulamayı çalıştırın:
+5. Run the application:
 ```bash
 dotnet run
 ```
 
-## Yapılandırma
+## 🔐 Configuration
 
-### Veritabanı Bağlantısı
+### Database Connection
 
-`appsettings.json` dosyasında `ConnectionStrings` bölümünü güncelleyin:
+Update the `ConnectionStrings` section in `appsettings.json`:
 
 ```json
 {
@@ -72,9 +70,9 @@ dotnet run
 }
 ```
 
-### Email Ayarları
+### 📧 Email Settings
 
-SMTP ayarlarınızı yapılandırın:
+Configure your SMTP settings:
 
 ```json
 {
@@ -87,59 +85,38 @@ SMTP ayarlarınızı yapılandırın:
 }
 ```
 
-**Not**: Gmail kullanıyorsanız, 2FA aktif olmalı ve uygulama şifresi oluşturmalısınız.
+**Note**: If you're using Gmail, 2FA must be enabled and you must use an App Password.
 
-## Kullanım
+### 👥 User Roles
 
-### Varsayılan Kullanıcılar
+- **Admin**: Full system management, user management, reporting  
+- **Instructor**: Reserve classrooms, view their own reservations  
+- **User**: Basic user operations
 
-Sistem ilk çalıştırıldığında varsayılan kullanıcılar oluşturulur:
-
-- **Admin**: `admin@example.com` / `Admin123!`
-- **Instructor**: `instructor@example.com` / `Instructor123!`
-
-### Roller
-
-- **Admin**: Tüm sistem yönetimi, kullanıcı yönetimi, raporlama
-- **Instructor**: Sınıf rezervasyonu, kendi rezervasyonlarını görüntüleme
-- **User**: Temel kullanıcı işlemleri
-
-## Proje Yapısı
+## 🗂 Project Structure
 
 ```
 ClassroomReservation/
 ├── Data/                   # Entity Framework DbContext
-├── Models/                 # Veri modelleri
+├── Models/                 # Data models
 ├── Pages/                  # Razor Pages
-│   ├── Admin/             # Admin paneli sayfaları
-│   ├── Instructor/        # Instructor paneli sayfaları
-│   └── Shared/            # Paylaşılan layout ve bileşenler
-├── Services/              # İş mantığı servisleri
-├── Migrations/            # Entity Framework migrasyonları
-└── wwwroot/              # Statik dosyalar (CSS, JS, images)
+│   ├── Admin/             # Admin panel pages
+│   ├── Instructor/        # Instructor panel pages
+│   └── Shared/            # Shared layouts and components
+├── Services/              # Business logic services
+├── Migrations/            # EF Core migrations
+└── wwwroot/              # Static files (CSS, JS, images)
 ```
 
-## Katkıda Bulunma
+## 📬 Contact
 
-1. Bu repoyu fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+Gökay Çetinakdoğan – gokaycetin44@gmail.com  
+LinkedIn – [https://www.linkedin.com/in/gokay-cetinakdogan/](https://www.linkedin.com/in/gokay-cetinakdogan/)  
+Project Link – [https://github.com/gokaycetin/ClassroomReservation](https://github.com/gokaycetin/ClassroomReservation)
 
-## Lisans
+## 🛡 Security Notes
 
-Bu proje MIT lisansı ile lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
-
-## İletişim
-
-Gökay Çetin - gokaycetin10@gmail.com
-
-Proje Linki: [https://github.com/gokaycetin/ClassroomReservation](https://github.com/gokaycetin/ClassroomReservation)
-
-## Güvenlik Notları
-
-- `appsettings.json` dosyası `.gitignore` listesinde bulunmaktadır
-- Hassas bilgiler için environment variables kullanın
-- Production ortamında güçlü şifreler kullanın
-- HTTPS kullanımı zorunludur
+- `appsettings.json` is included in `.gitignore`  
+- Use environment variables for sensitive data  
+- Use strong passwords in production  
+- HTTPS is required in production environments
