@@ -1,0 +1,408 @@
+@page
+@model ClassroomReservation.Pages.Admin.PanelModel
+@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="~/css/Instructor.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg bg-white fixed-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold" href="#">ClassroomReservation</a>
+        <div class="d-flex align-items-center">
+            <input type="checkbox" class="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="checkbox-label me-3">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+                <span class="ball"></span>
+            </label>
+            <a asp-page="/Index" asp-page-handler="Logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</nav>    <div class="container mt-5">
+    <h2 class="mb-4">Admin Panel</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h5>Add Academic Term</h5>
+                <form method="post" asp-page-handler="AddTerm">
+                    <div class="mb-3">
+                        <label for="termYear">Year</label>
+                        <select id="termYear" name="TermYear" class="form-select" required>
+                            <option value="">Select Year</option>
+                            @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 7; year++)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="termSeason">Season</label>
+                        <select id="termSeason" name="TermSeason" class="form-select" required>
+                            <option value="">Select Season</option>
+                            <option value="Spring">Spring</option>
+                            <option value="Fall">Fall</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Term</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h5>Add Instructor</h5>
+                <form method="post" asp-page-handler="AddInstructor">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="instructorName">Name</label>
+                            <input id="instructorName" name="InstructorName" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="instructorEmail">Email</label>
+                            <input id="instructorEmail" name="InstructorEmail" class="form-control" type="email" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="instructorPassword">Password</label>
+                            <input id="instructorPassword" name="InstructorPassword" class="form-control" type="password" required />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="submit" class="btn btn-primary">Add Instructor</button>
+                        <a asp-page="/Admin/Feedbacks" class="btn btn-secondary">Classrooms And Feedbacks</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mt-5">
+    <div class="card p-3">
+    <h2>Instructors</h2>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <table class="table table-striped table-hover w-100">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instructor in Model.Instructors)
+            {
+                <tr>
+                    <td>@instructor.Id</td>
+                    <td>@instructor.Name</td>
+                    <td>@instructor.Email</td>                    <td>
+                        <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editInstructorModal" 
+                               onclick="prepareEditModal(@instructor.Id, '@instructor.Name', '@instructor.Email')">
+                            Edit
+                        </button>                        <form method="post" asp-page-handler="DeleteInstructor" asp-route-instructorId="@instructor.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this instructor? This will remove all their account information.');">Delete Instructor</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">                <div class="card p-3">
+                    <h5>Reservation Requests</h5>
+                    <table class="table table-striped table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>Classroom</th>
+                                <th>Semester Name</th>
+                                <th>Instructor Name</th>
+                                <th>Instructor ID</th>
+                                <th>Request Date</th>
+                                <th>Reservation Date</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var request in Model.ReservationRequests)
+                            {
+                                var rowClass = request.IsConflict ? "table-danger" : (request.IsHoliday ? "table-warning" : "");
+                                <tr class="@rowClass">
+                                    <td>@request.ClassroomName</td>
+                                    <td>@request.SemesterName</td>
+                                    <td>@request.InstructorName</td>
+                                    <td>@request.InstructorId</td>
+                                    <td>@request.RequestDate.ToShortDateString()</td>
+                                    <td>@request.ReservationDate.ToShortDateString()</td>
+                                    <td>@request.StartTime</td>
+                                    <td>@request.EndTime</td>
+                                    <td>
+                                        <span class="badge @(request.Status == "Approved" ? "bg-success" : request.Status == "Rejected" ? "bg-danger" : "bg-warning text-dark")">@request.Status</span>
+                                    </td>                                    <td>
+                                        <div class="btn-group" role="group">
+                                            @if (!request.IsConflict)
+                                            {
+                                                @if (request.Status == "Approved")
+                                                {
+                                                    <button class="btn btn-sm btn-secondary" disabled>Approved</button>
+                                                    <form method="post" asp-page-handler="RejectRequest" asp-route-requestId="@request.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                    </form>
+                                                }
+                                                else if (request.Status == "Rejected")
+                                                {
+                                                    <form method="post" asp-page-handler="ApproveRequest" asp-route-requestId="@request.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                                    </form>
+                                                    <button class="btn btn-sm btn-secondary" disabled>Rejected</button>
+                                                }
+                                                else
+                                                {
+                                                    <form method="post" asp-page-handler="ApproveRequest" asp-route-requestId="@request.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                                    </form>
+                                                    <form method="post" asp-page-handler="RejectRequest" asp-route-requestId="@request.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                    </form>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-secondary" disabled>Cannot Approve</button>
+                                                <form method="post" asp-page-handler="RejectRequest" asp-route-requestId="@request.Id" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                </form>
+                                            }
+                                            <form method="post" asp-page-handler="DeleteRequest" asp-route-requestId="@request.Id" class="d-inline ms-1">
+                                                <button type="submit" class="btn btn-sm btn-dark" onclick="return confirm('Are you sure you want to delete this reservation?');">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @if (request.IsConflict)
+                                {
+                                    <tr class="table-danger">
+                                        <td colspan="10">
+                                            <div class="alert alert-danger mb-0">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                Time conflict detected! This reservation overlaps with another reservation in the same classroom during the same semester.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }                                @if (request.IsHoliday)
+                                {
+                                    <tr class="table-warning">
+                                        <td colspan="10">
+                                            <div class="alert alert-warning mb-0">
+                                                <i class="fas fa-calendar-alt me-2"></i>
+                                                <strong>Warning:</strong> This reservation falls on a public holiday in Turkey! 
+                                                
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card p-3">
+                <h5>Academic Terms</h5>
+                <table class="table table-striped table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Season</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var term in Model.Semesters)
+                        {
+                            <tr>                                <td>@term.Year</td>
+                                <td>@term.Season</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editSemesterModal" 
+                                           onclick="prepareEditSemesterModal(@term.Id, @term.Year, '@term.Season')">
+                                        Edit
+                                    </button>
+                                    <form method="post" asp-page-handler="DeleteSemester" asp-route-semesterId="@term.Id" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete Semester</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editInstructorModal" tabindex="-1" aria-labelledby="editInstructorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editInstructorModalLabel">Edit Instructor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">                <form id="editInstructorForm" method="post" asp-page-handler="EditInstructor" class="needs-validation" novalidate>
+                    <input type="hidden" id="editInstructorId" name="InstructorId" />
+                    <div class="mb-3">
+                        <label for="editInstructorName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editInstructorName" name="EditInstructorName" 
+                               required minlength="2" maxlength="50">
+                        <div class="invalid-feedback">
+                            Name must be between 2 and 50 characters.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editInstructorEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editInstructorEmail" name="EditInstructorEmail" required>
+                        <div class="invalid-feedback">
+                            Please enter a valid email address.
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editSemesterModal" tabindex="-1" aria-labelledby="editSemesterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editSemesterModalLabel">Edit Academic Term</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSemesterForm" method="post" asp-page-handler="EditSemester" class="needs-validation" novalidate>
+                    <input type="hidden" id="editSemesterId" name="SemesterId" />
+                    <div class="mb-3">
+                        <label for="editSemesterYear" class="form-label">Year</label>
+                        <select id="editSemesterYear" name="EditSemesterYear" class="form-select" required>
+                            <option value="">Select Year</option>
+                            @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 7; year++)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a year.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editSemesterSeason" class="form-label">Season</label>
+                        <select id="editSemesterSeason" name="EditSemesterSeason" class="form-select" required>
+                            <option value="">Select Season</option>
+                            <option value="Spring">Spring</option>
+                            <option value="Fall">Fall</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a season.
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const themeCheckbox = document.getElementById("themeCheckbox");
+
+    window.onload = function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+            document.body.classList.add("dark");
+            themeCheckbox.checked = true;
+        }
+    };
+
+    themeCheckbox.addEventListener("change", () => {
+        document.body.classList.toggle("dark");
+        const isDark = document.body.classList.contains("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+    });    function prepareEditModal(id, name, email) {
+        document.getElementById('editInstructorId').value = id;
+        document.getElementById('editInstructorName').value = name;
+        document.getElementById('editInstructorEmail').value = email;
+    }
+    
+    function prepareEditSemesterModal(id, year, season) {
+        document.getElementById('editSemesterId').value = id;
+        document.getElementById('editSemesterYear').value = year;
+        document.getElementById('editSemesterSeason').value = season;
+    }
+    
+    // Enable Bootstrap form validation
+    (() => {
+        'use strict';
+        
+        // Fetch all forms we want to apply validation styles to
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+@page
+@model ClassroomReservation.Pages.Admin.FeedbacksModel
+@{
+    ViewData["Title"] = "Feedbacks";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/Instructor.css" rel="stylesheet" />
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white fixed-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold" href="#">ClassroomReservation</a>
+        <div class="d-flex align-items-center">
+             <a asp-page="/Admin/Panel" class="btn btn-secondary me-2">Back to Panel</a>
+            <input type="checkbox" class="checkbox" id="themeCheckbox">
+            <label for="themeCheckbox" class="checkbox-label me-3">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+                <span class="ball"></span>
+            </label>
+            <a asp-page="/Index" asp-page-handler="Logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container mt-5">    <h2>Classroom Weekly schedule</h2>    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" onclick="changeWeek(-1)">Previous Week</button>
+        <h4 id="weekDisplay" class="mb-0">Week of @Model.WeekStartDate.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)</h4>
+        <button class="btn btn-primary" onclick="changeWeek(1)">Next Week</button>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Classrooms</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+        </thead>
+         <tbody>
+            @foreach (var classroom in Model.ClassroomList)
+            {
+                <tr>
+                    <td>Room @classroom.Value</td>
+                    @foreach (var schedule in Model.GetWeeklySchedule(classroom.Value))
+                    {
+                        <td>
+                            @foreach (var reservation in schedule)
+                            {                                <div class="reservation-slot">@if (reservation != null && reservation.StartTime.HasValue && reservation.EndTime.HasValue)
+                                    {                                        <small>
+                                            @(reservation.StartTime.Value.Hours.ToString("00")):@(reservation.StartTime.Value.Minutes.ToString("00")) - 
+                                            @(reservation.EndTime.Value.Hours.ToString("00")):@(reservation.EndTime.Value.Minutes.ToString("00"))<br/>
+                                            @reservation.InstructorName<br/>
+                                            <span class="status-badge">@reservation.Status</span>
+                                        </small>
+                                    }
+                                </div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+         </tbody>
+    </table>    <style>
+        .reservation-slot {
+            padding: 2px;
+            margin: 2px 0;
+            background-color: #f8f9fa;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }        .reservation-slot:not(:empty) {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .status-badge {
+            font-size: 0.75em;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+    </style>
+</div>
+
+<div class="container mt-5">
+    <h2>Classroom Ratings</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Classrooms</th>
+                <th>Average Rating ⭐</th>
+                
+            </tr>
+        </thead>        <tbody>
+            @foreach (var classroom in Model.ClassroomList)
+            {
+                var rating = Model.ClassroomAverageRatings.ContainsKey(classroom.Value) 
+                    ? Math.Round(Model.ClassroomAverageRatings[classroom.Value], 2) 
+                    : 0;
+                <tr>
+                    <td>Room @classroom.Value</td>
+                    <td>@rating</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<div class="container mt-5">
+    <h2>Feedbacks</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <table class="table table-striped">
+        <thead>
+            <tr>                <th>Instructor</th>
+                <th>Classroom</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Rating ⭐</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var feedback in Model.Feedbacks)
+            {
+                <tr>
+                    <td>@feedback.InstructorName</td>
+                    <td>Room @feedback.ClassroomId</td>
+                    <td>@feedback.Message</td>
+                    <td>@feedback.CreatedDate</td>
+                    <td>@feedback.Rating</td>
+                    <td>
+                        <form method="post"asp-page-handler="DeleteFeedback" style="display: inline;">
+                            <input type="hidden" name="feedbackId" value="@feedback.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const themeCheckbox = document.getElementById("themeCheckbox");
+
+    window.onload = function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+            document.body.classList.add("dark");
+            themeCheckbox.checked = true;
+        }
+    };    themeCheckbox.addEventListener("change", () => {
+        document.body.classList.toggle("dark");
+        const isDark = document.body.classList.contains("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+
+    function changeWeek(offset) {
+        window.location.href = `?handler=ChangeWeek&offset=${offset}`;
+    }
+</script>
+
+</body>
+</html>
