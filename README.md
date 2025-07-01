@@ -108,6 +108,11 @@ ClassroomReservation/
 └── wwwroot/              # Static files (CSS, JS, images)
 ```
 
+## 📄 Project Report
+
+Project Report:  
+[Classroom-Reservation Report](./CENG382_Report.pdf)
+
 ## 📬 Contact
 
 Gökay Çetinakdoğan – gokaycetin44@gmail.com  
